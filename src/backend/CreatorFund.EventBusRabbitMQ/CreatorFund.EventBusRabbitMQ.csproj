@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CreatorFund.EventBus\CreatorFund.EventBus.csproj" />
+    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.RabbitMQ.Client" Version="9.1.0"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2"/>
+    <PackageReference Include="Polly.Core" Version="8.5.2"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\shared\ActivityExtensions.cs">
+      <Link>ActivityExtensions.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
