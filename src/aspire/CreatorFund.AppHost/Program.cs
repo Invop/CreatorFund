@@ -6,11 +6,14 @@ var redis = builder.AddRedis("redis");
 var rabbitMq = builder.AddRabbitMQ("eventbus")
     .WithLifetime(ContainerLifetime.Persistent);
 var postgres = builder.AddPostgres("postgres")
-    .WithImageTag("latest")
     .WithPgAdmin()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var api = builder.AddProject<CreatorFund_Api>("api");
+var demosdb = postgres.AddDatabase("demosdb");
+
+var api = builder.AddProject<CreatorFund_Api>("api")
+    .WithReference(demosdb)
+    .WaitFor(demosdb);
 
 builder.AddNpmApp("angular", "../../frontend/creator-fund.web")
     .WaitFor(api)

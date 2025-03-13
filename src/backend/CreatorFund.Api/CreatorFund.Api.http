@@ -1,0 +1,15 @@
+### Get all Demo records
+GET https://localhost:7256/api/demo
+Content-Type: application/json
+
+###
+
+### Add a new Demo record
+POST https://localhost:7256/api/demo
+Content-Type: application/json
+
+{
+  "name": "New Demo"
+}
+
+###
