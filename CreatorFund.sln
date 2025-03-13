@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorFund.EventBusRabbitM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorFund.EventBus", "src\backend\CreatorFund.EventBus\CreatorFund.EventBus.csproj", "{42DC50A8-7BF6-46E3-A491-226B42D8E0D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorFund.TelegramBot", "src\backend\CreatorFund.TelegramBot\CreatorFund.TelegramBot.csproj", "{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,7 @@ Global
 		{79ADF505-80B0-40BF-BC98-DAACD7FFEF7B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{EBBDE051-6572-44F4-A92A-0835C4C936AF} = {3F18C12A-9891-40B3-8DAA-EE6152B1D4A1}
 		{42DC50A8-7BF6-46E3-A491-226B42D8E0D8} = {3F18C12A-9891-40B3-8DAA-EE6152B1D4A1}
+		{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002} = {3F18C12A-9891-40B3-8DAA-EE6152B1D4A1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1D80A200-C9A7-4B95-AFC9-F824300E7EBB}
@@ -98,5 +101,9 @@ Global
 		{42DC50A8-7BF6-46E3-A491-226B42D8E0D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42DC50A8-7BF6-46E3-A491-226B42D8E0D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42DC50A8-7BF6-46E3-A491-226B42D8E0D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C68B53C-2E1A-426E-BC6F-B4C2FF9E8002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
