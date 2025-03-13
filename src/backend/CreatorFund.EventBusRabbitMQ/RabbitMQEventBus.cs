@@ -17,6 +17,7 @@ public sealed class RabbitMQEventBus(
     RabbitMQTelemetry rabbitMQTelemetry) : IEventBus, IDisposable, IHostedService
 {
     private const string ExchangeName = "creatorfund_event_bus";
+    private const string DelayedExchangeName = "creatorfund_delayed_event_bus";
     private readonly ActivitySource _activitySource = rabbitMQTelemetry.ActivitySource;
 
     private readonly ResiliencePipeline _pipeline = CreateResiliencePipeline(options.Value.RetryCount);
@@ -116,6 +117,93 @@ public sealed class RabbitMQEventBus(
         });
     }
 
+    public Task PublishDelayedAsync(IntegrationEvent @event, TimeSpan delay)
+    {
+        var routingKey = @event.GetType().Name;
+
+        if (logger.IsEnabled(LogLevel.Trace))
+        {
+            logger.LogTrace(
+                "Creating RabbitMQ channel to publish delayed event: {EventId} ({EventName}) with delay {Delay}ms",
+                @event.Id, routingKey, delay.TotalMilliseconds);
+        }
+
+        using var channel = _rabbitMQConnection?.CreateModel() ??
+                            throw new InvalidOperationException("RabbitMQ connection is not open");
+
+        if (logger.IsEnabled(LogLevel.Trace))
+        {
+            logger.LogTrace("Declaring RabbitMQ delayed exchange to publish event: {EventId}", @event.Id);
+        }
+
+        // Declare the delayed message exchange
+        var args = new Dictionary<string, object> { { "x-delayed-type", "direct" } };
+
+        channel.ExchangeDeclare(DelayedExchangeName, "x-delayed-message", true, false, args);
+
+        var body = SerializeMessage(@event);
+
+        // Start an activity with a name following the semantic convention of the OpenTelemetry messaging specification
+        var activityName = $"{routingKey} publish-delayed";
+
+        return _pipeline.Execute(() =>
+        {
+            using var activity = _activitySource.StartActivity(activityName, ActivityKind.Client);
+
+            // Depending on Sampling (and whether a listener is registered or not), the activity above may not be created.
+            // If it is created, then propagate its context. If it is not created, the propagate the Current context, if any.
+            ActivityContext contextToInject = default;
+
+            if (activity != null)
+            {
+                contextToInject = activity.Context;
+            }
+            else if (Activity.Current != null)
+            {
+                contextToInject = Activity.Current.Context;
+            }
+
+            var properties = channel.CreateBasicProperties();
+            // persistent
+            properties.DeliveryMode = 2;
+
+            // Set up headers including the delay
+            properties.Headers = new Dictionary<string, object>
+            {
+                // x-delay is in milliseconds
+                { "x-delay", (int)delay.TotalMilliseconds }
+            };
+
+            _propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties,
+                InjectTraceContextIntoBasicProperties);
+
+            SetActivityContext(activity, routingKey, "publish-delayed");
+
+            if (logger.IsEnabled(LogLevel.Trace))
+            {
+                logger.LogTrace("Publishing delayed event to RabbitMQ: {EventId} with delay {Delay}ms",
+                    @event.Id, delay.TotalMilliseconds);
+            }
+
+            try
+            {
+                channel.BasicPublish(
+                    DelayedExchangeName,
+                    routingKey,
+                    true,
+                    properties,
+                    body);
+
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                activity.SetExceptionTags(ex);
+                throw;
+            }
+        });
+    }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         // Messaging is async so we don't need to wait for it to complete. On top of this
@@ -144,14 +232,28 @@ public sealed class RabbitMQEventBus(
                         logger.LogWarning(ea.Exception, "Error with RabbitMQ consumer channel");
                     };
 
-                    _consumerChannel.ExchangeDeclare(ExchangeName,
-                        "direct");
+                    // Declare standard direct exchange
+                    _consumerChannel.ExchangeDeclare(ExchangeName, "direct");
+
+                    // Declare delayed message exchange with x-delayed-type argument
+                    var args = new Dictionary<string, object> { { "x-delayed-type", "direct" } };
+
+                    if (logger.IsEnabled(LogLevel.Trace))
+                    {
+                        logger.LogTrace("Declaring delayed message exchange: {ExchangeName}", DelayedExchangeName);
+                    }
+
+                    _consumerChannel.ExchangeDeclare(DelayedExchangeName,
+                        "x-delayed-message",
+                        true, // durable 
+                        false, // auto-delete
+                        args);
 
                     _consumerChannel.QueueDeclare(_queueName,
-                        true,
-                        false,
-                        false,
-                        null);
+                        true, // durable
+                        false, // exclusive
+                        false, // auto-delete
+                        null); // arguments
 
                     if (logger.IsEnabled(LogLevel.Trace))
                     {
@@ -164,14 +266,28 @@ public sealed class RabbitMQEventBus(
 
                     _consumerChannel.BasicConsume(
                         _queueName,
-                        false,
+                        false, // autoAck
                         consumer);
 
                     foreach (var (eventName, _) in _subscriptionInfo.EventTypes)
                     {
+                        // Bind queue to standard exchange
                         _consumerChannel.QueueBind(
                             _queueName,
                             ExchangeName,
+                            eventName);
+
+                        // Also bind queue to delayed exchange
+                        if (logger.IsEnabled(LogLevel.Trace))
+                        {
+                            logger.LogTrace(
+                                "Binding queue {QueueName} to delayed exchange {ExchangeName} with routing key {RoutingKey}",
+                                _queueName, DelayedExchangeName, eventName);
+                        }
+
+                        _consumerChannel.QueueBind(
+                            _queueName,
+                            DelayedExchangeName,
                             eventName);
                     }
                 }
@@ -188,6 +304,12 @@ public sealed class RabbitMQEventBus(
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    private static void InjectTraceContextIntoBasicProperties(IBasicProperties props, string key, string value)
+    {
+        props.Headers ??= new Dictionary<string, object>();
+        props.Headers[key] = value;
     }
 
     private static void SetActivityContext(Activity activity, string routingKey, string operation)

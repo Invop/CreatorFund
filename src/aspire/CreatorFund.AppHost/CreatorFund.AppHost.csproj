@@ -9,6 +9,7 @@
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>b21d185c-d8b4-4cc0-bdbf-fcd98926899f</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,11 +18,27 @@
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.1.0"/>
     <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.1.0"/>
     <PackageReference Include="Aspire.Hosting.Redis" Version="9.1.0"/>
-    
+
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\backend\CreatorFund.Api\CreatorFund.Api.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\.dockerignore">
+      <Link>DockerFiles\RabbitMq\.dockerignore</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DockerFiles\RabbitMq\Dockerfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DockerFiles\RabbitMq\context\"/>
   </ItemGroup>
   <Target Name="RestoreNpm" BeforeTargets="Build" Condition=" '$(DesignTimeBuild)' != 'true' ">
     <ItemGroup>
