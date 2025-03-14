@@ -1,15 +1,8 @@
 ### Get all Demo records
-GET https://localhost:7256/api/demo
+POST https://localhost:7256/publish-delayed
 Content-Type: application/json
 
-###
-
-### Add a new Demo record
-POST https://localhost:7256/api/demo
+### Get all Demo records2
+GET https://localhost:7256/
 Content-Type: application/json
 
-{
-  "name": "New Demo"
-}
-
-###

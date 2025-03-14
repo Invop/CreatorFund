@@ -18,7 +18,10 @@
     <ProjectReference Include="..\..\aspire\CreatorFund.ServiceDefaults\CreatorFund.ServiceDefaults.csproj"/>
     <ProjectReference Include="..\CreatorFund.Application\CreatorFund.Application.csproj"/>
     <ProjectReference Include="..\CreatorFund.Contracts\CreatorFund.Contracts.csproj"/>
-    <ProjectReference Include="..\CreatorFund.EventBusRabbitMQ\CreatorFund.EventBusRabbitMQ.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\"/>
   </ItemGroup>
 
 </Project>

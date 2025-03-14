@@ -1,3 +1,4 @@
+using CreatorFund.TelegramBot;
 using CreatorFund.TelegramBot.Configuration;
 using CreatorFund.TelegramBot.Services;
 using CreatorFund.TelegramBot.Services.Messaging;
@@ -7,7 +8,7 @@ using Telegram.Bot;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddSystemd();
 var configuration = builder.Configuration;
-
+builder.AddRabbitMq("eventbus");
 builder.Services.Configure<BotConfiguration>(configuration.GetSection("BotConfiguration"));
 
 builder.Services.AddHttpClient("telegram_bot_client").RemoveAllLoggers()

@@ -81,12 +81,6 @@ public sealed class RabbitMQEventBus(
             // persistent
             properties.DeliveryMode = 2;
 
-            static void InjectTraceContextIntoBasicProperties(IBasicProperties props, string key, string value)
-            {
-                props.Headers ??= new Dictionary<string, object>();
-                props.Headers[key] = value;
-            }
-
             _propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), properties,
                 InjectTraceContextIntoBasicProperties);
 
