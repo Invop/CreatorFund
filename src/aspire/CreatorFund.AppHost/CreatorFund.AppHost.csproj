@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.1.0"/>
+    <PackageReference Include="Aspire.Hosting.AWS" Version="9.1.5"/>
     <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.1.0"/>
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.1.0"/>
     <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.1.0"/>
@@ -33,6 +34,9 @@
 
   <ItemGroup>
     <None Update="DockerFiles\RabbitMq\Dockerfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="app-resources.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

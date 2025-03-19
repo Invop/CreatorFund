@@ -1,3 +1,4 @@
+using Amazon;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -12,12 +13,13 @@ var rabbitMq = builder.AddRabbitMQ("eventbus")
 var postgres = builder.AddPostgres("postgres")
     .WithPgAdmin()
     .WithLifetime(ContainerLifetime.Persistent);
+var awsConfig = builder.AddAWSSDKConfig().WithProfile("dev")
+    .WithRegion(RegionEndpoint.EUCentral1);
 
-var demosdb = postgres.AddDatabase("demosdb");
+var awsResources = builder.AddAWSCloudFormationTemplate("AwsResources", "app-resources.template")
+    .WithReference(awsConfig);
 
 var api = builder.AddProject<CreatorFund_Api>("api")
-    .WithReference(demosdb)
-    .WaitFor(demosdb)
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq);
 
