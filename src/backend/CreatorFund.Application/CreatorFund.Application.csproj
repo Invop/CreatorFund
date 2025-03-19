@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.1.0"/>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400"/>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.415.20"/>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0"/>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3"/>
   </ItemGroup>
@@ -15,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Data\Migrations\"/>
     <Folder Include="Models\"/>
-    <Folder Include="Services\"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -19,9 +19,12 @@ var awsConfig = builder.AddAWSSDKConfig().WithProfile("dev")
 var awsResources = builder.AddAWSCloudFormationTemplate("AwsResources", "app-resources.template")
     .WithReference(awsConfig);
 
+
 var api = builder.AddProject<CreatorFund_Api>("api")
     .WithReference(rabbitMq)
-    .WaitFor(rabbitMq);
+    .WaitFor(rabbitMq)
+    .WaitFor(awsResources)
+    .WithReference(awsResources);
 
 builder.AddNpmApp("angular", "../../frontend/creator-fund.web")
     .WaitFor(api)

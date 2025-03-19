@@ -1,8 +1,4 @@
-### Get all Demo records
-POST https://localhost:7256/publish-delayed
-Content-Type: application/json
-
-### Get all Demo records2
-GET https://localhost:7256/
+### demo
+POST https://localhost:7256/test
 Content-Type: application/json
 

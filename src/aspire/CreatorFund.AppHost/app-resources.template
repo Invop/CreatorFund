@@ -7,5 +7,10 @@
         "BucketName": "testbucket-creatorfund2"
       }
     }
+  },
+  "Outputs" : {
+      "BucketName" : {
+          "Value" : { "Ref" : "S3Bucket" }
+      }
   }
 }

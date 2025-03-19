@@ -1,4 +1,4 @@
-﻿using CreatorFund.Application.Data;
+﻿using Amazon.S3;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +22,20 @@ public static class ApplicationServiceCollectionExtensions
 
     public static TBuilder AddDatabase<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.AddNpgsqlDbContext<CreatorFundDbContext>("demosdb");
+        //builder.AddNpgsqlDbContext<CreatorFundDbContext>();
         return builder;
     }
+
+    public static TBuilder AddAws<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.Configure<AWSResources>(
+            builder.Configuration.GetSection("AWS:Resources"));
+        builder.Services.AddAWSService<IAmazonS3>();
+        return builder;
+    }
+}
+
+public class AWSResources
+{
+    public string? BucketName { get; set; }
 }
